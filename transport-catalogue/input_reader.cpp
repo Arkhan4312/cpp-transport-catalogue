@@ -106,35 +106,22 @@ void InputReader::ParseLine(std::string_view line) {
 }
 
 void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) const {
-    for (const auto& cmd : commands_) {
-        if (cmd.command == "Stop") {
-            auto coords = detail::ParseCoordinates(cmd.description);
-            catalogue.AddStop(cmd.id, coords.lat, coords.lng);
+   for (const auto& cmd : commands_) {
+    if (cmd.command == "Stop") {
+        auto coords = detail::ParseCoordinates(cmd.description);
+        catalogue.AddStop(cmd.id,coords.lat,coords.lng);
+     }
+}
+   for (const auto& cmd : commands_) {
+    if (cmd.command == "Bus") {
+        auto route_stops_view = detail::ParseRoute(cmd.description);
+        std::vector<std::string> stop_names;
+        stop_names.reserve(route_stops_view.size());
+        for (auto sv : route_stops_view) {
+            stop_names.emplace_back(sv);
         }
-    }
-
-    for (const auto& cmd : commands_) {
-        if (cmd.command == "Bus") {
-            bool is_ring = (cmd.description.find('>') != std::string::npos);
-            std::vector<std::string> stop_names;
-
-            if (is_ring) {
-                auto parts = detail::Split(cmd.description, '>');
-                stop_names.reserve(parts.size());
-                for (auto sv : parts) {
-                    stop_names.emplace_back(sv);
-                }
-            }
-            else {
-                auto parts = detail::Split(cmd.description, '-');
-                stop_names.reserve(parts.size());
-                for (auto sv : parts) {
-                    stop_names.emplace_back(sv);
-                }
-            }
-
-            catalogue.AddBus(cmd.id, std::move(stop_names), is_ring);
-        }
-    }
+        catalogue.AddBus(cmd.id,std::move(stop_names),true);
+     }
+}
 }
 } // namespace transport
