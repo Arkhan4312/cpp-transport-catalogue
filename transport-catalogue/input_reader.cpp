@@ -106,7 +106,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
             auto coords = detail::ParseCoordinates(cmd.description);
             catalogue.AddStop(cmd.id,coords);
         }
-}
+    }
     for (const auto& cmd : commands_) {
         if (cmd.command == "Bus") {
             auto route_stops_view = detail::ParseRoute(cmd.description);
@@ -122,7 +122,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
 }
 
 void InputReader::ReadRequest(std::istream& input) { 
-    int base_request_count;
+    size_t base_request_count;
     input >> base_request_count >> std::ws;
     for (size_t i = 0; i < base_request_count; ++i) {
         std::string line;
