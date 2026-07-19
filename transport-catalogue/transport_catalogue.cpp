@@ -45,7 +45,7 @@ TransportCatalogue::RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) c
 		return { 0,0,0.0 };
 	}
 	std::vector<const Stop*> route_stops;
-	route_stops.reserve(bus->stops.size() * 2 - 1);
+	route_stops.reserve(bus->stops.size() * 2);
 	route_stops.insert(route_stops.end(), bus->stops.begin(), bus->stops.end());
 	if (!bus->is_ring) {
 		for (auto it = bus->stops.rbegin() + 1; it != bus->stops.rend(); ++it) {
