@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
-
+#include <iostream>
 namespace transport {
 namespace detail {
 /**
@@ -68,12 +68,7 @@ std::vector<std::string_view> ParseRoute(std::string_view route) {
     if (route.find('>') != route.npos) {
         return Split(route, '>');
     }
-
-    auto stops = Split(route, '-');
-    std::vector<std::string_view> results(stops.begin(), stops.end());
-    results.insert(results.end(), std::next(stops.rbegin()), stops.rend());
-
-    return results;
+    return Split(route, '-');
 }
 
 CommandDescription ParseCommandDescription(std::string_view line) {
@@ -106,22 +101,33 @@ void InputReader::ParseLine(std::string_view line) {
 }
 
 void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) const {
-   for (const auto& cmd : commands_) {
-    if (cmd.command == "Stop") {
-        auto coords = detail::ParseCoordinates(cmd.description);
-        catalogue.AddStop(cmd.id,coords.lat,coords.lng);
-     }
-}
-   for (const auto& cmd : commands_) {
-    if (cmd.command == "Bus") {
-        auto route_stops_view = detail::ParseRoute(cmd.description);
-        std::vector<std::string> stop_names;
-        stop_names.reserve(route_stops_view.size());
-        for (auto sv : route_stops_view) {
-            stop_names.emplace_back(sv);
+    for (const auto& cmd : commands_) {
+        if (cmd.command == "Stop") {
+            auto coords = detail::ParseCoordinates(cmd.description);
+            catalogue.AddStop(cmd.id,coords);
         }
-        catalogue.AddBus(cmd.id,std::move(stop_names),true);
-     }
 }
+    for (const auto& cmd : commands_) {
+        if (cmd.command == "Bus") {
+            auto route_stops_view = detail::ParseRoute(cmd.description);
+            bool is_ring = (cmd.description.find('>') != std::string::npos);
+            std::vector<std::string> stop_names;
+            stop_names.reserve(route_stops_view.size());
+            for (auto sv : route_stops_view) {
+                stop_names.emplace_back(sv);
+            }
+        catalogue.AddBus(cmd.id,std::move(stop_names),is_ring);
+        }
+    }
+}
+
+void InputReader::ReadRequest(std::istream& input) { 
+    int base_request_count;
+    input >> base_request_count >> std::ws;
+    for (size_t i = 0; i < base_request_count; ++i) {
+        std::string line;
+        std::getline(input, line);
+        ParseLine(line);
+    }
 }
 } // namespace transport
