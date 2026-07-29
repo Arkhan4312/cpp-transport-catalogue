@@ -116,7 +116,7 @@ void InputReader::ParseLine(std::string_view line) {
 
 void InputReader::AddStops(TransportCatalogue& catalogue) const {
     for(const auto& cmd : commands_) {
-        if(cmd.command == "Stop") {
+        if (cmd.command == "Stop") {
             auto coords = detail::ParseCoordinates(cmd.description);
             catalogue.AddStop(cmd.id, coords);
         }
@@ -127,7 +127,7 @@ void InputReader::AddDistances(TransportCatalogue& catalogue) const {
     for (const auto& cmd : commands_) {
         if (cmd.command != "Stop") {
             continue;
-                }
+            }
         auto parts = detail::Split(cmd.description, ',');
         if (parts.size() < 3 ) {
             continue;
