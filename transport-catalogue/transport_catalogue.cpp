@@ -81,34 +81,12 @@ TransportCatalogue::RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) c
 	if (route.empty()) {
 		return { 0,0,0.0,0.0 };
 	}
-<<<<<<< HEAD
-	std::vector<const Stop*> route_stops;
-	route_stops.reserve(bus->stops.size() * 2);
-	route_stops.insert(route_stops.end(), bus->stops.begin(), bus->stops.end());
-	if (!bus->is_ring) {
-		for (auto it = bus->stops.rbegin() + 1; it != bus->stops.rend(); ++it) {
-			route_stops.push_back(*it);
-		}
-	}
-	size_t stops_count = route_stops.size();
-	std::unordered_set<std::string_view> unique_names;
-	for (const Stop* stop : route_stops) {
-		unique_names.insert(stop->name);
-	}
-	size_t unique_stops = unique_names.size();
-	double route_length = 0.0;
-	for (size_t i = 1; i < route_stops.size(); ++i) {
-		route_length += ComputeDistance(route_stops[i - 1]->coordinates, route_stops[i]->coordinates);
-	}
-	return RouteInfo{ stops_count,unique_stops,route_length };
-=======
 	size_t stops_count = route.size();
 	size_t unique_stops = detail::CountUniqueStops(route);
 	auto [route_length, geo_length] = detail::ComputeLengths(route, *this);
 
 	double curvature = (geo_length == 0.0) ? 1.0 : route_length / geo_length;
 	return RouteInfo{ stops_count,unique_stops,route_length,curvature };
->>>>>>> 09f9ce1 (Добавлены измерения по дорогам)
 }
 
 const std::unordered_set<std::string_view>* TransportCatalogue::GetBusesForStop(const Stop* stop) const {
@@ -121,9 +99,6 @@ const std::unordered_set<std::string_view>* TransportCatalogue::GetBusesForStop(
 	}
 	return nullptr;
 }
-<<<<<<< HEAD
-} // namespace transport
-=======
 
 void TransportCatalogue::SetDistance(const Stop* from, const Stop* to, double distance) {
 	distances_[{from, to}] = distance;
@@ -141,4 +116,3 @@ double TransportCatalogue::GetDistance(const Stop* from, const Stop* to) const {
 	return 0.0;
 }
 } // namespace transport
->>>>>>> 09f9ce1 (Добавлены измерения по дорогам)

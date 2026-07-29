@@ -116,20 +116,18 @@ void InputReader::ParseLine(std::string_view line) {
 
 void InputReader::AddStops(TransportCatalogue& catalogue) const {
     for(const auto& cmd : commands_) {
-        if (cmd.command == "Stop") {
+        if(cmd.command == "Stop") {
             auto coords = detail::ParseCoordinates(cmd.description);
             catalogue.AddStop(cmd.id, coords);
         }
     }
-<<<<<<< HEAD
-=======
 }
 
 void InputReader::AddDistances(TransportCatalogue& catalogue) const {
     for (const auto& cmd : commands_) {
         if (cmd.command != "Stop") {
             continue;
-            }
+                }
         auto parts = detail::Split(cmd.description, ',');
         if (parts.size() < 3 ) {
             continue;
@@ -149,7 +147,6 @@ void InputReader::AddDistances(TransportCatalogue& catalogue) const {
 }
 
 void InputReader::AddBusses(TransportCatalogue& catalogue) const {
->>>>>>> 09f9ce1 (Добавлены измерения по дорогам)
     for (const auto& cmd : commands_) {
         if (cmd.command == "Bus") {
             auto route_stops_view = detail::ParseRoute(cmd.description);
@@ -171,7 +168,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue& catalogue) 
 }
 
 void InputReader::ReadRequest(std::istream& input) { 
-    size_t base_request_count;
+    int base_request_count;
     input >> base_request_count >> std::ws;
     for (int i = 0; i < base_request_count; ++i) {
         std::string line;
