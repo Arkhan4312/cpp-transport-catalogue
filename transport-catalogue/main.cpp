@@ -15,7 +15,7 @@ int main() {
         reader.ReadRequest(cin);
         reader.ApplyCommands(catalogue);
     }
-    
+
     ProcessStatRequest(cin, cout, catalogue);
 
     return 0;

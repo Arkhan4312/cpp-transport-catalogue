@@ -1,7 +1,8 @@
 #include "stat_reader.h"
-#include <vector>
+
 #include <algorithm>
 #include <iomanip>
+#include <vector>
 namespace transport {
 namespace detail {
 std::string_view TrimStat(std::string_view string) {
@@ -20,12 +21,12 @@ struct StatQuery {
 StatQuery ParseStatQuery(std::string_view request) {
     const size_t space_pos = request.find(' ');
     if (space_pos == std::string_view::npos) {
-        return { request, {} };
+        return {request, {}};
     }
     std::string_view type = request.substr(0, space_pos);
-    std::string_view name = request.substr(space_pos+1);
+    std::string_view name = request.substr(space_pos + 1);
     name = TrimStat(name);
-    return { type, name };
+    return {type, name};
 }
 
 void PrintBusInfo(const TransportCatalogue& transport_catalogue, std::string_view bus_name, std::ostream& output) {
@@ -35,11 +36,9 @@ void PrintBusInfo(const TransportCatalogue& transport_catalogue, std::string_vie
         return;
     }
     const auto info = transport_catalogue.GetRouteInfo(bus);
-    output << "Bus " << bus_name << ": "
-        << info.stops_count << " stops on route, "
-        << info.unique_stops << " unique stops, "
-        << std::fixed << std::setprecision(6) << info.route_length << " route length, "
-        << std::fixed << std::setprecision(6) << info.curvature << " curvature\n";
+    output << "Bus " << bus_name << ": " << info.stops_count << " stops on route, " << info.unique_stops
+           << " unique stops, " << std::fixed << std::setprecision(6) << info.route_length << " route length, "
+           << std::fixed << std::setprecision(6) << info.curvature << " curvature\n";
 }
 
 void PrintStopInfo(const TransportCatalogue& transport_catalogue, std::string_view stop_name, std::ostream& output) {
@@ -61,7 +60,7 @@ void PrintStopInfo(const TransportCatalogue& transport_catalogue, std::string_vi
     }
     output << "\n";
 }
-} // namespace detail
+}  // namespace detail
 
 void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::string_view request, std::ostream& output) {
     const auto parsed = detail::ParseStatQuery(request);
@@ -81,4 +80,4 @@ void ProcessStatRequest(std::istream& input, std::ostream& output, const Transpo
         ParseAndPrintStat(catalogue, line, output);
     }
 }
-} // namespace transport
+}  // namespace transport

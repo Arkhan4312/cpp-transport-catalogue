@@ -2,6 +2,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
 #include "geo.h"
 #include "transport_catalogue.h"
 
@@ -19,10 +20,16 @@ struct CommandDescription {
     std::string description;  // Параметры команды
 };
 
+struct ParsedDistance {
+    std::string_view stop_name;
+    double distance;
+};
+
 class InputReader {
 public:
     /**
-     * Парсит строку в структуру CommandDescription и сохраняет результат в commands_
+     * Парсит строку в структуру CommandDescription и сохраняет результат в
+     * commands_
      */
     void ParseLine(std::string_view line);
 
@@ -32,12 +39,12 @@ public:
 
     void AddStops(TransportCatalogue& catalogue) const;
     void AddDistances(TransportCatalogue& catalogue) const;
-    void AddBusses(TransportCatalogue& catalogue) const;
+    void AddBuses(TransportCatalogue& catalogue) const;
     void ApplyCommands(TransportCatalogue& catalogue) const;
 
     void ReadRequest(std::istream& input);
 
-   private:
+private:
     std::vector<CommandDescription> commands_;
 };
-} // namespace transport
+}  // namespace transport
