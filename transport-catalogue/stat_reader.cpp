@@ -72,7 +72,7 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
 }
 
 void ProcessStatRequest(std::istream& input, std::ostream& output, const TransportCatalogue& catalogue) {
-    size_t stat_request_count;
+    int stat_request_count;
     input >> stat_request_count >> std::ws;
     for (int i = 0; i < stat_request_count; ++i) {
         std::string line;
