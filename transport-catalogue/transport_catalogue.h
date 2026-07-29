@@ -4,6 +4,8 @@
 #include <vector>
 #include <deque>
 #include <unordered_set>
+#include <utility>
+#include <functional>
 #include "geo.h"
 namespace transport {
 	struct Stop {
@@ -16,6 +18,14 @@ namespace transport {
 		bool is_ring = false;
 		std::vector<const Stop*> stops;
 	};
+	
+	struct PairHash {
+		size_t operator()(const std::pair<const Stop*, const Stop*>& p) const noexcept {
+			size_t h1 = std::hash<const void*>{}(p.first);
+			size_t h2 = std::hash<const void*>{}(p.second);
+			return h1 ^ (h2 << 1);
+		}
+	};
 
 class TransportCatalogue {
 public:
@@ -23,6 +33,7 @@ public:
 		size_t stops_count;
 		size_t unique_stops;
 		double route_length;
+		double curvature;
 	};
 
 	void AddStop(std::string name, Coordinates coords);
@@ -36,11 +47,16 @@ public:
 	RouteInfo GetRouteInfo(const Bus* bus) const;
 
 	const std::unordered_set<std::string_view>* GetBusesForStop(const Stop* stop) const;
+
+	void SetDistance(const Stop* from, const Stop* to, double distance);
+
+	double GetDistance(const Stop* from, const Stop* to) const;
 private:
 	std::deque<Stop> stops_;
 	std::unordered_map<std::string_view, const Stop*> stop_names_;
 	std::deque<Bus> buses_;
 	std::unordered_map<std::string_view, const Bus*> bus_names_;
 	std::unordered_map<const Stop*, std::unordered_set<std::string_view>> stop_to_buses_;
+	std::unordered_map<std::pair<const Stop*, const Stop*>, double, PairHash> distances_;
 	};
 } // namespace transport

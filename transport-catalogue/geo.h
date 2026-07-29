@@ -1,6 +1,6 @@
 #pragma once
-
 #include <cmath>
+#include <algorithm>
 namespace transport {
 struct Coordinates {
     double lat;
@@ -20,8 +20,9 @@ inline double ComputeDistance(Coordinates from, Coordinates to) {
     }
     static const double dr = 3.1415926535 / 180.;
     static const int kEarthRadius = 6371000;
-    return acos(sin(from.lat * dr) * sin(to.lat * dr)
-                + cos(from.lat * dr) * cos(to.lat * dr) * cos(abs(from.lng - to.lng) * dr))
-        * kEarthRadius;
+    double ratio = sin(from.lat * dr) * sin(to.lat * dr)
+        + cos(from.lat * dr) * cos(to.lat * dr) * cos(abs(from.lng - to.lng) * dr);
+    ratio = std::clamp(ratio, -1.0, 1.0);
+    return acos(ratio) * kEarthRadius;
 }
 } // namespace transport

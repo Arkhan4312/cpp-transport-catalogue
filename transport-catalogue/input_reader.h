@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <string_view>
 #include <vector>
@@ -30,6 +29,10 @@ public:
     /**
      * Наполняет данными транспортный справочник, используя команды из commands_
      */
+
+    void AddStops(TransportCatalogue& catalogue) const;
+    void AddDistances(TransportCatalogue& catalogue) const;
+    void AddBusses(TransportCatalogue& catalogue) const;
     void ApplyCommands(TransportCatalogue& catalogue) const;
 
     void ReadRequest(std::istream& input);

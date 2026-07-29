@@ -38,7 +38,8 @@ void PrintBusInfo(const TransportCatalogue& transport_catalogue, std::string_vie
     output << "Bus " << bus_name << ": "
         << info.stops_count << " stops on route, "
         << info.unique_stops << " unique stops, "
-        << std::fixed << std::setprecision(6) << info.route_length << " route length\n";
+        << std::fixed << std::setprecision(6) << info.route_length << " route length, "
+        << std::fixed << std::setprecision(6) << info.curvature << " curvature\n";
 }
 
 void PrintStopInfo(const TransportCatalogue& transport_catalogue, std::string_view stop_name, std::ostream& output) {
@@ -60,22 +61,21 @@ void PrintStopInfo(const TransportCatalogue& transport_catalogue, std::string_vi
     }
     output << "\n";
 }
-} // detail namespace
+} // namespace detail
 
 void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::string_view request, std::ostream& output) {
     const auto parsed = detail::ParseStatQuery(request);
     if (parsed.type == "Bus") {
         detail::PrintBusInfo(transport_catalogue, parsed.name, output);
-    }   
-    else if (parsed.type == "Stop") {
-            detail::PrintStopInfo(transport_catalogue, parsed.name, output);
-        }
+    } else if (parsed.type == "Stop") {
+        detail::PrintStopInfo(transport_catalogue, parsed.name, output);
+    }
 }
 
 void ProcessStatRequest(std::istream& input, std::ostream& output, const TransportCatalogue& catalogue) {
     size_t stat_request_count;
     input >> stat_request_count >> std::ws;
-    for (size_t i = 0; i < stat_request_count; ++i) {
+    for (int i = 0; i < stat_request_count; ++i) {
         std::string line;
         std::getline(input, line);
         ParseAndPrintStat(catalogue, line, output);
