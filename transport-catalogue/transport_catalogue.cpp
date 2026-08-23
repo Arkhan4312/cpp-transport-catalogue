@@ -8,7 +8,7 @@ std::vector<const Stop*> BuildFullRoute(const Bus* bus) {
         return {};
     }
     std::vector<const Stop*> route;
-    size_t reserve_size = bus->is_ring ? bus->stops.size() : bus->stops.size() * 2 - 1;
+    size_t reserve_size = bus->is_ring ? bus->stops.size() + 1 : bus->stops.size() * 2 - 1;
     route.reserve(reserve_size);
     route.insert(route.end(), bus->stops.begin(), bus->stops.end());
     if (!bus->is_ring) {
@@ -84,7 +84,7 @@ const Bus* TransportCatalogue::FindBus(std::string_view name) const {
     return nullptr;
 }
 
-TransportCatalogue::RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) const {
+RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) const {
     auto route = detail::BuildFullRoute(bus);
     if (route.empty()) {
         return {0, 0, 0.0, 0.0};
@@ -122,5 +122,21 @@ double TransportCatalogue::GetDistance(const Stop* from, const Stop* to) const {
         return it_rev->second;
     }
     return 0.0;
+}
+std::vector<const Bus*> TransportCatalogue::GetAllBuses() const {
+    std::vector<const Bus*> result;
+    result.reserve(bus_names_.size());
+    for (const auto& [name, bus] : bus_names_) {
+        result.push_back(bus);
+    }
+    return result;
+}
+std::vector<const Stop*> TransportCatalogue::GetAllStops() const {
+    std::vector<const Stop*> result;
+    result.reserve(stop_names_.size());
+    for (const auto& [name, stop] : stop_names_) {
+        result.push_back(stop);
+    }
+    return result;
 }
 }  // namespace transport

@@ -7,33 +7,12 @@
 #include <utility>
 #include <vector>
 
+#include "domain.h"
 #include "geo.h"
 namespace transport {
-struct Stop {
-    std::string name;
-    Coordinates coordinates;
-};
-
-struct Bus {
-    std::string name;
-    bool is_ring = false;
-    std::vector<const Stop*> stops;
-};
-
-struct RouteLengths {
-    double road;
-    double geo;
-};
 
 class TransportCatalogue {
 public:
-    struct RouteInfo {
-        size_t stops_count;
-        size_t unique_stops;
-        double route_length;
-        double curvature;
-    };
-
     void AddStop(std::string name, Coordinates coords);
 
     void AddBus(std::string name, const std::vector<std::string_view>& stop_names, bool is_ring);
@@ -49,6 +28,10 @@ public:
     void SetDistance(const Stop* from, const Stop* to, double distance);
 
     double GetDistance(const Stop* from, const Stop* to) const;
+
+    std::vector<const Bus*> GetAllBuses() const;
+
+    std::vector<const Stop*> GetAllStops() const;
 
 private:
     struct PairHash {
