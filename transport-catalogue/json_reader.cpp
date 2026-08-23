@@ -20,7 +20,7 @@ void JsonReader::LoadData(std::istream& input) {
     const Dict& root = doc_->GetRoot().AsMap();
 
     const Array& base_requests = root.at("base_requests").AsArray();
-    
+
     data_loader_->LoadBaseRequest(base_requests);
 
     if (root.count("render_settings")) {

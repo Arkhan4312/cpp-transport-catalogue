@@ -163,7 +163,6 @@ private:
     std::optional<StrokeLineJoin> stroke_line_join_;
 };
 
-
 class Circle : public Object, public PathProps<Circle> {
 public:
     Circle& SetCenter(Point center);

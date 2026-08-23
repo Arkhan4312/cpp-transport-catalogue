@@ -37,7 +37,8 @@ private:
 
 class MapRenderer {
 public:
-    MapRenderer(const std::vector<const Bus*>& buses, const std::vector<const Stop*>& stops, const RenderSettings& settings);
+    MapRenderer(const std::vector<const Bus*>& buses, const std::vector<const Stop*>& stops,
+                const RenderSettings& settings);
     svg::Document Render() const;
 
 private:
