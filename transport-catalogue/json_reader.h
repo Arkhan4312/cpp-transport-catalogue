@@ -6,7 +6,6 @@
 #include "json.h"
 #include "json_data_loader.h"
 #include "map_renderer.h"
-#include "map_saver.h"
 #include "query_processor.h"
 #include "request_handler.h"
 #include "transport_catalogue.h"
@@ -20,8 +19,6 @@ public:
 
     void ProcessRequests(std::ostream& output) const;
 
-    RenderSettings GetRenderSettings() const;
-
     void MapToFile(const std::string& filename) const;
 
 private:
@@ -31,6 +28,7 @@ private:
     std::unique_ptr<QueryProcessor> query_processor_;
     std::optional<json::Document> doc_;
     std::optional<RenderSettings> render_settings_;
+    std::optional<json::Array> stat_requests_;
 };
 
 }  // namespace transport

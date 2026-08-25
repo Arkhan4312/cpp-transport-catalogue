@@ -17,19 +17,18 @@ std::optional<RouteInfo> RequestHandler::GetBusInfo(std::string_view bus_name) c
     return catalogue_.GetRouteInfo(bus);
 }
 
-std::vector<std::string> RequestHandler::GetBusesForStop(std::string_view stop_name) const {
+std::vector<std::string_view> RequestHandler::GetBusesForStop(std::string_view stop_name) const {
     const Stop* stop = catalogue_.FindStop(stop_name);
     if (!stop) {
         return {};
     }
-    const auto* buses_set = catalogue_.GetBusesForStop(stop);
-    if (!buses_set) {
-        return {};
-    }
-    std::vector<std::string> result;
-    result.reserve(buses_set->size());
-    for (std::string_view name : *buses_set) {
-        result.emplace_back(name);
+    auto opt = catalogue_.GetBusesForStop(stop);
+    const auto& buses_set = opt->get();
+
+    std::vector<std::string_view> result;
+    result.reserve(buses_set.size());
+    for (std::string_view name : buses_set) {
+        result.push_back(name);
     }
     std::sort(result.begin(), result.end());
     return result;
@@ -39,13 +38,14 @@ bool RequestHandler::HasStop(std::string_view stop_name) const {
     return catalogue_.FindStop(stop_name) != nullptr;
 }
 
-bool RequestHandler::HasBus(std::string_view bus_name) const {
-    return catalogue_.FindBus(bus_name) != nullptr;
-}
 std::string RequestHandler::RenderMap(const RenderSettings& settings) const {
-    auto buses = catalogue_.GetAllBuses();
-    auto stops = catalogue_.GetAllStops();
-    MapRenderer renderer(buses, stops, settings);
+    const auto& buses = catalogue_.GetAllBuses();
+    std::vector<const Bus*> bus_ptrs;
+    bus_ptrs.reserve(buses.size());
+    for (const auto& bus : buses) {
+        bus_ptrs.push_back(&bus);
+    }
+    MapRenderer renderer(bus_ptrs, settings);
     svg::Document doc = renderer.Render();
     std::ostringstream out;
     doc.Render(out);

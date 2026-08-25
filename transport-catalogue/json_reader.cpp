@@ -1,9 +1,6 @@
 #include "json_reader.h"
 
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <vector>
+#include "map_saver.h"
 namespace transport {
 
 using namespace json;
@@ -19,42 +16,38 @@ void JsonReader::LoadData(std::istream& input) {
     doc_ = Load(input);
     const Dict& root = doc_->GetRoot().AsMap();
 
-    const Array& base_requests = root.at("base_requests").AsArray();
+    auto base_it = root.find("base_requests");
+    if (base_it != root.end()) {
+        const auto& base_requests = base_it->second.AsArray();
+        data_loader_->LoadBaseRequest(base_requests);
+    }
 
-    data_loader_->LoadBaseRequest(base_requests);
+    auto stat_it = root.find("stat_requests");
+    if (stat_it != root.end()) {
+        stat_requests_ = stat_it->second.AsArray();
+    }
 
-    if (root.count("render_settings")) {
-        render_settings_ = data_loader_->ParseRenderSettings(root.at("render_settings").AsMap());
-    } else {
-        throw std::logic_error("No render_settings");
+    auto render_it = root.find("render_settings");
+    if (render_it != root.end()) {
+        render_settings_ = data_loader_->ParseRenderSettings(render_it->second.AsMap());
     }
 }
 
 void JsonReader::ProcessRequests(std::ostream& output) const {
-    if (!doc_ || !render_settings_) {
-        throw std::logic_error("Data not loaded or render settings missing");
+    if (!stat_requests_.has_value()) {
+        json::Print(json::Document{json::Array{}}, output);
+        return;
     }
-
-    const auto& root = doc_->GetRoot().AsMap();
-    const auto& stat_request = root.at("stat_requests").AsArray();
-
-    auto answers = query_processor_->ProcessRequests(stat_request, *render_settings_);
-    Document out_doc(std::move(answers));
-    Print(out_doc, output);
-}
-
-RenderSettings JsonReader::GetRenderSettings() const {
-    if (!render_settings_) {
-        throw std::logic_error("Render settings not loaded");
-    }
-    return *render_settings_;
+    auto answers = query_processor_->ProcessRequests(stat_requests_.value(), render_settings_.value());
+    json::Document doc(std::move(answers));
+    json::Print(doc, output);
 }
 
 void JsonReader::MapToFile(const std::string& filename) const {
-    if (!render_settings_) {
-        throw std::logic_error("Render settings not loaded");
+    if (!render_settings_.has_value()) {
+        SaveMapToFile("", filename);
     }
-    std::string svg = handler_.RenderMap(*render_settings_);
+    std::string svg = handler_.RenderMap(render_settings_.value());
     SaveMapToFile(svg, filename);
 }
 

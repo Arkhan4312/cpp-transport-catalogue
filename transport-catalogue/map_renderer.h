@@ -16,9 +16,9 @@ struct RenderSettings {
     svg::Point bus_label_offset;
     int stop_label_font_size = 0;
     svg::Point stop_label_offset;
-    std::string underlayer_color;
+    svg::Color underlayer_color;
     double underlayer_width = 0.0;
-    std::vector<std::string> color_palette;
+    std::vector<svg::Color> color_palette;
 };
 
 class SphereProjector {
@@ -31,20 +31,29 @@ private:
     double max_lat_ = 0.0;
     double min_lng_ = 0.0;
     double max_lng_ = 0.0;
-    double zoom_coef_ = 0.0;
-    double padding_ = 0.0;
+    double zoom_coef_ = 1.0;
+    double padding_;
 };
 
 class MapRenderer {
 public:
-    MapRenderer(const std::vector<const Bus*>& buses, const std::vector<const Stop*>& stops,
-                const RenderSettings& settings);
+    MapRenderer(const std::vector<const Bus*>& buses, const RenderSettings& settings);
     svg::Document Render() const;
 
 private:
-    const std::vector<const Bus*> buses_;
-    const std::vector<const Stop*> stops_;
+    const std::vector<const Bus*>& buses_;
     const RenderSettings& settings_;
+
+    void PrepareData(std::vector<const Bus*>& sorted_buses, std::vector<const Stop*>& unique_stops) const;
+    SphereProjector CreateProjector(const std::vector<const Stop*>& unique_stops) const;
+    void RenderBusLines(svg::Document& doc, const std::vector<const Bus*>& sorted_buses,
+                        const SphereProjector& projector) const;
+    void RenderBusLabels(svg::Document& doc, const std::vector<const Bus*>& sorted_buses,
+                         const SphereProjector& projector) const;
+    void RenderStopCircles(svg::Document& doc, const std::vector<const Stop*>& unique_stops,
+                           const SphereProjector& projector) const;
+    void RenderStopLabels(svg::Document& doc, const std::vector<const Stop*>& unique_stops,
+                          const SphereProjector& projector) const;
 };
 
 }  // namespace transport

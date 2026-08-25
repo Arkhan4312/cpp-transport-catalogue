@@ -19,6 +19,6 @@ private:
     void AddStop(const json::Dict& stop_node);
     void AddDistances(const json::Dict& stop_node);
     void AddBus(const json::Dict& bus_node);
-    std::string ParseColor(const json::Node& node) const;
+    svg::Color ParseColor(const json::Node& node) const;
 };
 }  // namespace transport

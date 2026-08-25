@@ -4,7 +4,7 @@ using namespace json;
 QueryProcessor::QueryProcessor(const RequestHandler& handler) : handler_(handler) {
 }
 
-Array QueryProcessor::ProcessRequests(const Array& stat_requests, const RenderSettings& settings) const {
+Array QueryProcessor::ProcessRequests(const Array& stat_requests, const std::optional<RenderSettings>& settings) const {
     Array answers;
     answers.reserve(stat_requests.size());
 
@@ -12,27 +12,28 @@ Array QueryProcessor::ProcessRequests(const Array& stat_requests, const RenderSe
         const Dict& req = req_node.AsMap();
         std::string type = req.at("type").AsString();
 
-        Dict answer;
-        answer["request_id"] = req.at("id").AsInt();
-
         if (type == "Bus") {
-            answer = MakeBusResponse(req);
+            answers.emplace_back(MakeBusResponse(req));
         } else if (type == "Stop") {
-            answer = MakeStopResponse(req);
+            answers.emplace_back(MakeStopResponse(req));
         } else if (type == "Map") {
-            answer["map"] = handler_.RenderMap(settings);
+            Dict answer;
+            answer["request_id"] = req.at("id").AsInt();
+            if (settings.has_value()) {
+                answer["map"] = handler_.RenderMap(settings.value());
+            } else {
+                answer["map"] = "";
+            }
+            answers.emplace_back(std::move(answer));
         }
-
-        answers.emplace_back(std::move(answer));
     }
     return answers;
 }
 
 Dict QueryProcessor::MakeBusResponse(const Dict& request) const {
     Dict answer;
-    std::string bus_name = request.at("name").AsString();
-    int request_id = request.at("id").AsInt();
-    answer["request_id"] = request_id;
+    const std::string& bus_name = request.at("name").AsString();
+    answer["request_id"] = request.at("id").AsInt();
 
     auto info = handler_.GetBusInfo(bus_name);
     if (!info) {
@@ -49,9 +50,8 @@ Dict QueryProcessor::MakeBusResponse(const Dict& request) const {
 
 Dict QueryProcessor::MakeStopResponse(const Dict& request) const {
     Dict answer;
-    std::string stop_name = request.at("name").AsString();
-    int request_id = request.at("id").AsInt();
-    answer["request_id"] = request_id;
+    const std::string& stop_name = request.at("name").AsString();
+    answer["request_id"] = request.at("id").AsInt();
 
     if (!handler_.HasStop(stop_name)) {
         answer["error_message"] = std::string("not found");
@@ -62,7 +62,7 @@ Dict QueryProcessor::MakeStopResponse(const Dict& request) const {
     Array buses_array;
     buses_array.reserve(buses.size());
     for (const auto& bus : buses) {
-        buses_array.emplace_back(bus);
+        buses_array.emplace_back(std::string(bus));
     }
     answer["buses"] = std::move(buses_array);
     return answer;

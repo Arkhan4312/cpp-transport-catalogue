@@ -97,15 +97,17 @@ RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) const {
     return RouteInfo{stops_count, unique_stops, lengths.road, curvature};
 }
 
-const std::unordered_set<std::string_view>* TransportCatalogue::GetBusesForStop(const Stop* stop) const {
+const std::optional<std::reference_wrapper<const std::unordered_set<std::string_view>>>
+TransportCatalogue::GetBusesForStop(const Stop* stop) const {
     if (!stop) {
-        return nullptr;
+        return std::nullopt;
     }
     auto it = stop_to_buses_.find(stop);
     if (it != stop_to_buses_.end()) {
-        return &it->second;
+        return std::cref(it->second);
     }
-    return nullptr;
+    static const std::unordered_set<std::string_view> empty_set;
+    return std::cref(empty_set);
 }
 
 void TransportCatalogue::SetDistance(const Stop* from, const Stop* to, double distance) {
@@ -123,20 +125,10 @@ double TransportCatalogue::GetDistance(const Stop* from, const Stop* to) const {
     }
     return 0.0;
 }
-std::vector<const Bus*> TransportCatalogue::GetAllBuses() const {
-    std::vector<const Bus*> result;
-    result.reserve(bus_names_.size());
-    for (const auto& [name, bus] : bus_names_) {
-        result.push_back(bus);
-    }
-    return result;
+const std::deque<Bus>& TransportCatalogue::GetAllBuses() const {
+    return buses_;
 }
-std::vector<const Stop*> TransportCatalogue::GetAllStops() const {
-    std::vector<const Stop*> result;
-    result.reserve(stop_names_.size());
-    for (const auto& [name, stop] : stop_names_) {
-        result.push_back(stop);
-    }
-    return result;
+const std::deque<Stop>& TransportCatalogue::GetAllStops() const {
+    return stops_;
 }
 }  // namespace transport

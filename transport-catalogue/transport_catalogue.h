@@ -1,6 +1,5 @@
 #pragma once
 #include <deque>
-#include <functional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -23,15 +22,16 @@ public:
 
     RouteInfo GetRouteInfo(const Bus* bus) const;
 
-    const std::unordered_set<std::string_view>* GetBusesForStop(const Stop* stop) const;
-
     void SetDistance(const Stop* from, const Stop* to, double distance);
 
     double GetDistance(const Stop* from, const Stop* to) const;
 
-    std::vector<const Bus*> GetAllBuses() const;
+    const std::deque<Bus>& GetAllBuses() const;
 
-    std::vector<const Stop*> GetAllStops() const;
+    const std::deque<Stop>& GetAllStops() const;
+
+    const std::optional<std::reference_wrapper<const std::unordered_set<std::string_view>>> GetBusesForStop(
+        const Stop* stop) const;
 
 private:
     struct PairHash {

@@ -6,10 +6,47 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
-
 namespace svg {
+struct Rgb {
+    int r;
+    int g;
+    int b;
+    bool operator==(const Rgb& other) const = default;
+};
 
+struct Rgba {
+    int r;
+    int g;
+    int b;
+    double a;
+    bool operator==(const Rgba& other) const = default;
+};
+
+using Color = std::variant<std::monostate, std::string, Rgb, Rgba>;
+inline const std::monostate NoneColor{};
+
+inline void PrintColor(const Color& color, std::ostream& out) {
+    std::visit(
+        [&out](const auto& value) {
+            using T = std::decay_t<decltype(value)>;
+            if constexpr (std::is_same_v<T, std::monostate>) {
+                out << "none";
+            } else if constexpr (std::is_same_v<T, std::string>) {
+                out << value;
+            } else if constexpr (std::is_same_v<T, Rgb>) {
+                out << "rgb(" << value.r << "," << value.g << "," << value.b << ")";
+            } else if constexpr (std::is_same_v<T, Rgba>) {
+                out << "rgba(" << value.r << "," << value.g << "," << value.b << "," << value.a << ")";
+            }
+        },
+        color);
+}
+inline std::ostream& operator<<(std::ostream& out, const Color& color) {
+    PrintColor(color, out);
+    return out;
+}
 namespace detail {
 
 template <typename T>
@@ -48,9 +85,6 @@ struct Point {
     double x = 0;
     double y = 0;
 };
-
-using Color = std::string;
-inline const Color NoneColor{"none"};
 
 /*
  * Вспомогательная структура, хранящая контекст для вывода SVG-документа с отступами.

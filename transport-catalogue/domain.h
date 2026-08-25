@@ -28,10 +28,4 @@ struct RouteInfo {
     double curvature;
 };
 
-struct BusLabelInfo {
-    svg::Point point;
-    std::string text;
-    std::string color;
-};
-
 }  // namespace transport
