@@ -19,8 +19,6 @@ public:
 
     void ProcessRequests(std::ostream& output) const;
 
-    void MapToFile(const std::string& filename) const;
-
 private:
     TransportCatalogue& catalogue_;
     const RequestHandler& handler_;

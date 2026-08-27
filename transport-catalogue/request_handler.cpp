@@ -22,8 +22,7 @@ std::vector<std::string_view> RequestHandler::GetBusesForStop(std::string_view s
     if (!stop) {
         return {};
     }
-    auto opt = catalogue_.GetBusesForStop(stop);
-    const auto& buses_set = opt->get();
+    const auto& buses_set = catalogue_.GetBusesForStop(stop);
 
     std::vector<std::string_view> result;
     result.reserve(buses_set.size());

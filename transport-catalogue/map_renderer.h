@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "domain.h"
@@ -41,7 +40,7 @@ public:
     svg::Document Render() const;
 
 private:
-    const std::vector<const Bus*>& buses_;
+    std::vector<const Bus*> buses_;
     const RenderSettings& settings_;
 
     void PrepareData(std::vector<const Bus*>& sorted_buses, std::vector<const Stop*>& unique_stops) const;

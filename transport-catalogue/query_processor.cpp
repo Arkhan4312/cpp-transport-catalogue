@@ -10,7 +10,7 @@ Array QueryProcessor::ProcessRequests(const Array& stat_requests, const std::opt
 
     for (const Node& req_node : stat_requests) {
         const Dict& req = req_node.AsMap();
-        std::string type = req.at("type").AsString();
+        const std::string& type = req.at("type").AsString();
 
         if (type == "Bus") {
             answers.emplace_back(MakeBusResponse(req));

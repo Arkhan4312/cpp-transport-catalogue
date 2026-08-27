@@ -100,7 +100,7 @@ public:
     }
 
     bool operator==(const Node& rhs) const {
-        return *this == rhs;
+        return GetValue() == rhs.GetValue();
     }
 
     const Value& GetValue() const {

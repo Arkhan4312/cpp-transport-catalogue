@@ -30,8 +30,7 @@ public:
 
     const std::deque<Stop>& GetAllStops() const;
 
-    const std::optional<std::reference_wrapper<const std::unordered_set<std::string_view>>> GetBusesForStop(
-        const Stop* stop) const;
+    const std::unordered_set<std::string_view>& GetBusesForStop(const Stop* stop) const;
 
 private:
     struct PairHash {

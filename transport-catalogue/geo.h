@@ -1,6 +1,5 @@
 #pragma once
-#include <algorithm>
-#include <cmath>
+
 namespace transport {
 struct Coordinates {
     double lat;

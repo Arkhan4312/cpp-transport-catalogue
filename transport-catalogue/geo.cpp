@@ -1,4 +1,7 @@
 #include "geo.h"
+
+#include <algorithm>
+#include <cmath>
 namespace transport {
 double ComputeDistance(Coordinates from, Coordinates to) {
     using namespace std;

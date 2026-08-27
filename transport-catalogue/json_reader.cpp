@@ -1,6 +1,5 @@
 #include "json_reader.h"
 
-#include "map_saver.h"
 namespace transport {
 
 using namespace json;
@@ -38,17 +37,9 @@ void JsonReader::ProcessRequests(std::ostream& output) const {
         json::Print(json::Document{json::Array{}}, output);
         return;
     }
-    auto answers = query_processor_->ProcessRequests(stat_requests_.value(), render_settings_.value());
+    auto answers = query_processor_->ProcessRequests(stat_requests_.value(), render_settings_);
     json::Document doc(std::move(answers));
     json::Print(doc, output);
-}
-
-void JsonReader::MapToFile(const std::string& filename) const {
-    if (!render_settings_.has_value()) {
-        SaveMapToFile("", filename);
-    }
-    std::string svg = handler_.RenderMap(render_settings_.value());
-    SaveMapToFile(svg, filename);
 }
 
 }  // namespace transport

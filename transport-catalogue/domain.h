@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "geo.h"
-#include "svg.h"
 namespace transport {
 struct Stop {
     std::string name;

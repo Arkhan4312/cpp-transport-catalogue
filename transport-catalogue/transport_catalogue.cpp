@@ -97,17 +97,16 @@ RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) const {
     return RouteInfo{stops_count, unique_stops, lengths.road, curvature};
 }
 
-const std::optional<std::reference_wrapper<const std::unordered_set<std::string_view>>>
-TransportCatalogue::GetBusesForStop(const Stop* stop) const {
+const std::unordered_set<std::string_view>& TransportCatalogue::GetBusesForStop(const Stop* stop) const {
+    static const std::unordered_set<std::string_view> empty_set;
     if (!stop) {
-        return std::nullopt;
+        return empty_set;
     }
     auto it = stop_to_buses_.find(stop);
     if (it != stop_to_buses_.end()) {
-        return std::cref(it->second);
+        return it->second;
     }
-    static const std::unordered_set<std::string_view> empty_set;
-    return std::cref(empty_set);
+    return empty_set;
 }
 
 void TransportCatalogue::SetDistance(const Stop* from, const Stop* to, double distance) {
