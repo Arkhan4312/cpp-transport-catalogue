@@ -34,6 +34,11 @@ private:
     double padding_;
 };
 
+struct PreparedData {
+    std::vector<const Bus*> sorted_bus;
+    std::vector<const Stop*> unique_stops;
+};
+
 class MapRenderer {
 public:
     MapRenderer(const std::vector<const Bus*>& buses, const RenderSettings& settings);
@@ -43,7 +48,7 @@ private:
     std::vector<const Bus*> buses_;
     const RenderSettings& settings_;
 
-    void PrepareData(std::vector<const Bus*>& sorted_buses, std::vector<const Stop*>& unique_stops) const;
+    PreparedData PrepareData() const;
     SphereProjector CreateProjector(const std::vector<const Stop*>& unique_stops) const;
     void RenderBusLines(svg::Document& doc, const std::vector<const Bus*>& sorted_buses,
                         const SphereProjector& projector) const;

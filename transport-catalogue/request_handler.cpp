@@ -50,4 +50,7 @@ std::string RequestHandler::RenderMap(const RenderSettings& settings) const {
     doc.Render(out);
     return out.str();
 }
+const TransportCatalogue& RequestHandler::GetCatalogue() const {
+    return catalogue_;
+}
 }  // namespace transport

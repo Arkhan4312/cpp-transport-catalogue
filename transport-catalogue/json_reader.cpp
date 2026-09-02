@@ -1,13 +1,14 @@
 #include "json_reader.h"
 
+#include "json_builder.h"
+
 namespace transport {
 
 using namespace json;
 
-JsonReader::JsonReader(TransportCatalogue& catalogue, const RequestHandler& handler)
-    : catalogue_(catalogue),
-      handler_(handler),
-      data_loader_(std::make_unique<JsonDataLoader>(catalogue)),
+JsonReader::JsonReader(TransportCatalogue& catalogue_, const RequestHandler& handler)
+    : handler_(handler),
+      data_loader_(std::make_unique<JsonDataLoader>(catalogue_)),
       query_processor_(std::make_unique<QueryProcessor>(handler)) {
 }
 
@@ -34,7 +35,8 @@ void JsonReader::LoadData(std::istream& input) {
 
 void JsonReader::ProcessRequests(std::ostream& output) const {
     if (!stat_requests_.has_value()) {
-        json::Print(json::Document{json::Array{}}, output);
+        json::Document empty_doc{json::Builder{}.StartArray().EndArray().Build()};
+        json::Print(empty_doc, output);
         return;
     }
     auto answers = query_processor_->ProcessRequests(stat_requests_.value(), render_settings_);

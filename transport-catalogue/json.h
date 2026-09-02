@@ -11,16 +11,21 @@ namespace json {
 class Node;
 using Dict = std::map<std::string, Node>;
 using Array = std::vector<Node>;
-using Value = std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string>;
 
 class ParsingError : public std::runtime_error {
 public:
     using runtime_error::runtime_error;
 };
 
-class Node final : private Value {
+class Node final : private std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
 public:
-    using Value::Value;
+    using variant::variant;
+    using Value = variant;
+
+    explicit Node(const Value& val) : variant(val) {
+    }
+    explicit Node(Value&& val) : variant(std::move(val)) {
+    }
 
     bool IsInt() const {
         return std::holds_alternative<int>(*this);
@@ -104,6 +109,10 @@ public:
     }
 
     const Value& GetValue() const {
+        return *this;
+    }
+
+    Value& GetValue() {
         return *this;
     }
 };

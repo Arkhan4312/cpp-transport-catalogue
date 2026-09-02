@@ -8,19 +8,17 @@
 #include "map_renderer.h"
 #include "query_processor.h"
 #include "request_handler.h"
-#include "transport_catalogue.h"
 namespace transport {
 
 class JsonReader {
 public:
-    explicit JsonReader(TransportCatalogue& catalogue, const RequestHandler& handler);
+    explicit JsonReader(TransportCatalogue& catalogue_, const RequestHandler& handler);
 
     void LoadData(std::istream& input);
 
     void ProcessRequests(std::ostream& output) const;
 
 private:
-    TransportCatalogue& catalogue_;
     const RequestHandler& handler_;
     std::unique_ptr<JsonDataLoader> data_loader_;
     std::unique_ptr<QueryProcessor> query_processor_;

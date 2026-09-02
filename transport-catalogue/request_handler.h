@@ -18,6 +18,7 @@ public:
     bool HasStop(std::string_view stop_name) const;
 
     std::string RenderMap(const RenderSettings& settings) const;
+    const TransportCatalogue& GetCatalogue() const;
 
 private:
     const TransportCatalogue& catalogue_;

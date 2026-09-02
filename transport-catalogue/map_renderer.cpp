@@ -115,20 +115,22 @@ MapRenderer::MapRenderer(const std::vector<const Bus*>& buses, const RenderSetti
     : buses_(buses), settings_(settings) {
 }
 
-void MapRenderer::PrepareData(std::vector<const Bus*>& sorted_buses, std::vector<const Stop*>& unique_stops) const {
-    sorted_buses = buses_;
-    std::sort(sorted_buses.begin(), sorted_buses.end(),
+PreparedData MapRenderer::PrepareData() const {
+    PreparedData result;
+    result.sorted_bus = buses_;
+    std::sort(result.sorted_bus.begin(), result.sorted_bus.end(),
               [](const Bus* lhs, const Bus* rhs) { return lhs->name < rhs->name; });
 
     std::unordered_set<const Stop*> unique_stops_set;
-    for (const Bus* bus : sorted_buses) {
+    for (const Bus* bus : result.sorted_bus) {
         for (const Stop* stop : bus->stops) {
             unique_stops_set.insert(stop);
         }
     }
-    unique_stops.assign(unique_stops_set.begin(), unique_stops_set.end());
-    std::sort(unique_stops.begin(), unique_stops.end(),
+    result.unique_stops.assign(unique_stops_set.begin(), unique_stops_set.end());
+    std::sort(result.unique_stops.begin(), result.unique_stops.end(),
               [](const Stop* lhs, const Stop* rhs) { return lhs->name < rhs->name; });
+    return result;
 }
 
 SphereProjector MapRenderer::CreateProjector(const std::vector<const Stop*>& unique_stops) const {
@@ -235,21 +237,19 @@ void MapRenderer::RenderStopLabels(svg::Document& doc, const std::vector<const S
 }
 
 svg::Document MapRenderer::Render() const {
-    std::vector<const Bus*> sorted_buses;
-    std::vector<const Stop*> unique_stops;
-    PrepareData(sorted_buses, unique_stops);
+    PreparedData data = PrepareData();
 
-    if (unique_stops.empty()) {
+    if (data.unique_stops.empty()) {
         return svg::Document{};
     }
 
-    SphereProjector projector = CreateProjector(unique_stops);
+    SphereProjector projector = CreateProjector(data.unique_stops);
     svg::Document doc;
 
-    RenderBusLines(doc, sorted_buses, projector);
-    RenderBusLabels(doc, sorted_buses, projector);
-    RenderStopCircles(doc, unique_stops, projector);
-    RenderStopLabels(doc, unique_stops, projector);
+    RenderBusLines(doc, data.sorted_bus, projector);
+    RenderBusLabels(doc, data.sorted_bus, projector);
+    RenderStopCircles(doc, data.unique_stops, projector);
+    RenderStopLabels(doc, data.unique_stops, projector);
     return doc;
 }
 }  // namespace transport
