@@ -4,6 +4,20 @@
 
 namespace transport {
 using namespace json;
+
+namespace {
+Node MakeErrorResponse(int id, const std::string& message) {
+    return json::Builder{}
+        .StartDict()
+        .Key("request_id")
+        .Value(id)
+        .Key("error_message")
+        .Value(message)
+        .EndDict()
+        .Build();
+}
+
+}  // namespace
 QueryProcessor::QueryProcessor(const RequestHandler& handler) : handler_(handler) {
 }
 
@@ -36,18 +50,12 @@ Array QueryProcessor::ProcessRequests(const Array& stat_requests, const std::opt
 
 Dict QueryProcessor::MakeBusResponse(const Dict& request) const {
     const std::string& bus_name = request.at("name").AsString();
+    int id = request.at("id").AsInt();
 
     auto info = handler_.GetBusInfo(bus_name);
 
     if (!info) {
-        Node node = Builder{}
-                        .StartDict()
-                        .Key("request_id")
-                        .Value(request.at("id").AsInt())
-                        .Key("error_message")
-                        .Value("not found")
-                        .EndDict()
-                        .Build();
+        Node node = MakeErrorResponse(id, "not found");
         return std::get<Dict>(node.GetValue());
     }
     Node node = Builder{}
@@ -69,16 +77,10 @@ Dict QueryProcessor::MakeBusResponse(const Dict& request) const {
 
 Dict QueryProcessor::MakeStopResponse(const Dict& request) const {
     const std::string& stop_name = request.at("name").AsString();
+    int id = request.at("id").AsInt();
 
     if (!handler_.HasStop(stop_name)) {
-        Node node = Builder{}
-                        .StartDict()
-                        .Key("request_id")
-                        .Value(request.at("id").AsInt())
-                        .Key("error_message")
-                        .Value("not found")
-                        .EndDict()
-                        .Build();
+        Node node = MakeErrorResponse(id, "not found");
         return std::get<Dict>(node.GetValue());
     }
 
