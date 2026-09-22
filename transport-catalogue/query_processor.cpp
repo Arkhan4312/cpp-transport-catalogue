@@ -9,7 +9,8 @@ namespace {
 Node MakeErrorResponse(int id, const std::string& message) {
     return json::Builder{}
         .StartDict()
-        .Key("request_id").Value(id)
+        .Key("request_id")
+        .Value(id)
         .Key("error_message")
         .Value(message)
         .EndDict()
