@@ -8,14 +8,19 @@ using namespace std::literals;
 
 namespace json {
 
-Builder::Builder() : root_(), nodes_stack_{&root_} {
+Builder::Builder() : root_(std::in_place), nodes_stack_{&*root_} {
 }
 
 Node Builder::Build() {
+    if (!root_.has_value()) {
+        throw std::logic_error("Attempt to build JSON twice");
+    }
     if (!nodes_stack_.empty()) {
         throw std::logic_error("Attempt to build JSON which isn't finalized"s);
     }
-    return std::move(root_);
+    Node result = std::move(*root_);
+    root_.reset();
+    return result;
 }
 
 Builder::DictValueContext Builder::Key(std::string key) {
@@ -54,7 +59,7 @@ Builder::BaseContext Builder::EndDict() {
 
 Builder::BaseContext Builder::EndArray() {
     if (!std::holds_alternative<Array>(GetCurrentValue())) {
-        throw std::logic_error("EndDict() outside an array"s);
+        throw std::logic_error("EndArray() outside an array"s);
     }
     nodes_stack_.pop_back();
     return *this;
@@ -67,11 +72,7 @@ Node::Value& Builder::GetCurrentValue() {
     return nodes_stack_.back()->GetValue();
 }
 
-const Node::Value& Builder::GetCurrentValue() const {
-    return const_cast<Builder*>(this)->GetCurrentValue();
-}
-
-void Builder::AssertNewObjectContext() const {
+void Builder::AssertNewObjectContext() {
     if (!std::holds_alternative<std::nullptr_t>(GetCurrentValue())) {
         throw std::logic_error("New object in wrong context"s);
     }

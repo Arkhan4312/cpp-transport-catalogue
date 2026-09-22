@@ -16,7 +16,8 @@ public:
 private:
     const RequestHandler& handler_;
 
-    json::Dict MakeBusResponse(const json::Dict& request) const;
-    json::Dict MakeStopResponse(const json::Dict& request) const;
+    json::Node MakeBusResponse(const json::Dict& request) const;
+    json::Node MakeStopResponse(const json::Dict& request) const;
+    json::Node MakeRouteResponse(const json::Dict& request) const;
 };
 }  // namespace transport

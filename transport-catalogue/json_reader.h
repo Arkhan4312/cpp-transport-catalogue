@@ -12,17 +12,16 @@ namespace transport {
 
 class JsonReader {
 public:
-    explicit JsonReader(TransportCatalogue& catalogue_, const RequestHandler& handler);
+    explicit JsonReader(TransportCatalogue& catalogue, RequestHandler& handler);
 
     void LoadData(std::istream& input);
 
     void ProcessRequests(std::ostream& output) const;
 
 private:
-    const RequestHandler& handler_;
-    std::unique_ptr<JsonDataLoader> data_loader_;
-    std::unique_ptr<QueryProcessor> query_processor_;
-    std::optional<json::Document> doc_;
+    RequestHandler& handler_;
+    JsonDataLoader data_loader_;
+    QueryProcessor query_processor_;
     std::optional<RenderSettings> render_settings_;
     std::optional<json::Array> stat_requests_;
 };

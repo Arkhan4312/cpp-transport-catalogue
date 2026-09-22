@@ -53,4 +53,13 @@ std::string RequestHandler::RenderMap(const RenderSettings& settings) const {
 const TransportCatalogue& RequestHandler::GetCatalogue() const {
     return catalogue_;
 }
+void RequestHandler::SetRoutingSettings(const RoutingSettings& settings) {
+    router_ = std::make_unique<TransportRouter>(catalogue_, settings);
+}
+std::optional<RouteResult> RequestHandler::GetRoute(std::string_view from, std::string_view to) const {
+    if (!router_) {
+        return std::nullopt;
+    }
+    return router_->BuildRoute(from, to);
+}
 }  // namespace transport

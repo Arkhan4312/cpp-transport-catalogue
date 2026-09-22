@@ -8,8 +8,7 @@ JsonDataLoader::JsonDataLoader(TransportCatalogue& catalogue) : catalogue_(catal
 void JsonDataLoader::LoadBaseRequest(const Array& base_requests) {
     for (const Node& node : base_requests) {
         const Dict& req = node.AsMap();
-        const std::string& type = req.at("type").AsString();
-        if (type == "Stop") {
+        if (req.at("type").AsString() == "Stop") {
             AddStop(req);
         }
     }
@@ -19,17 +18,12 @@ void JsonDataLoader::LoadBaseRequest(const Array& base_requests) {
         const std::string& type = req.at("type").AsString();
         if (type == "Stop") {
             AddDistances(req);
-        }
-    }
-
-    for (const Node& node : base_requests) {
-        const Dict& req = node.AsMap();
-        const std::string& type = req.at("type").AsString();
-        if (type == "Bus") {
+        } else if (type == "Bus") {
             AddBus(req);
         }
     }
 }
+
 RenderSettings JsonDataLoader::ParseRenderSettings(const json::Dict& settings_dict) const {
     RenderSettings settings;
     settings.width = settings_dict.at("width").AsDouble();
@@ -50,6 +44,12 @@ RenderSettings JsonDataLoader::ParseRenderSettings(const json::Dict& settings_di
     for (const auto& color_node : palette) {
         settings.color_palette.push_back(ParseColor(color_node));
     }
+    return settings;
+}
+RoutingSettings JsonDataLoader::ParseRoutingSettings(const json::Dict& settings_dict) const {
+    RoutingSettings settings;
+    settings.bus_wait_time = settings_dict.at("bus_wait_time").AsInt();
+    settings.bus_velocity = settings_dict.at("bus_velocity").AsDouble();
     return settings;
 }
 void JsonDataLoader::AddStop(const json::Dict& stop_node) {

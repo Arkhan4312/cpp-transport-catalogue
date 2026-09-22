@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -25,13 +26,12 @@ public:
     BaseContext EndArray();
 
 private:
-    Node root_;
+    std::optional<Node> root_;
     std::vector<Node*> nodes_stack_;
 
     Node::Value& GetCurrentValue();
-    const Node::Value& GetCurrentValue() const;
 
-    void AssertNewObjectContext() const;
+    void AssertNewObjectContext();
     void AddObject(Node::Value value, bool one_shot);
 
     class BaseContext {

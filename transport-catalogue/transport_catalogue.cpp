@@ -3,21 +3,6 @@
 #include "geo.h"
 namespace transport {
 namespace detail {
-std::vector<const Stop*> BuildFullRoute(const Bus* bus) {
-    if (!bus || bus->stops.empty()) {
-        return {};
-    }
-    std::vector<const Stop*> route;
-    size_t reserve_size = bus->is_ring ? bus->stops.size() + 1 : bus->stops.size() * 2 - 1;
-    route.reserve(reserve_size);
-    route.insert(route.end(), bus->stops.begin(), bus->stops.end());
-    if (!bus->is_ring) {
-        for (auto it = bus->stops.rbegin() + 1; it != bus->stops.rend(); ++it) {
-            route.push_back(*it);
-        }
-    }
-    return route;
-}
 
 size_t CountUniqueStops(const std::vector<const Stop*>& route) {
     std::unordered_set<std::string_view> unique_names;
@@ -85,7 +70,7 @@ const Bus* TransportCatalogue::FindBus(std::string_view name) const {
 }
 
 RouteInfo TransportCatalogue::GetRouteInfo(const Bus* bus) const {
-    auto route = detail::BuildFullRoute(bus);
+    auto route = BuildFullRoute(*bus);
     if (route.empty()) {
         return {0, 0, 0.0, 0.0};
     }

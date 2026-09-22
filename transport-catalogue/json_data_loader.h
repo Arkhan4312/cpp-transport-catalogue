@@ -2,6 +2,7 @@
 #include "json.h"
 #include "map_renderer.h"
 #include "transport_catalogue.h"
+#include "transport_router.h"
 
 namespace transport {
 
@@ -12,6 +13,7 @@ public:
     void LoadBaseRequest(const json::Array& base_requests);
 
     RenderSettings ParseRenderSettings(const json::Dict& settings_dict) const;
+    RoutingSettings ParseRoutingSettings(const json::Dict& settings_dict) const;
 
 private:
     TransportCatalogue& catalogue_;

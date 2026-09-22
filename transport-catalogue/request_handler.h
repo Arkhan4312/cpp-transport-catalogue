@@ -7,6 +7,7 @@
 #include "domain.h"
 #include "map_renderer.h"
 #include "transport_catalogue.h"
+#include "transport_router.h"
 
 namespace transport {
 class RequestHandler {
@@ -20,7 +21,11 @@ public:
     std::string RenderMap(const RenderSettings& settings) const;
     const TransportCatalogue& GetCatalogue() const;
 
+    void SetRoutingSettings(const RoutingSettings& settings);
+    std::optional<RouteResult> GetRoute(std::string_view from, std::string_view to) const;
+
 private:
     const TransportCatalogue& catalogue_;
+    std::unique_ptr<TransportRouter> router_;
 };
 }  // namespace transport

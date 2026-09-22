@@ -27,4 +27,5 @@ struct RouteInfo {
     double curvature;
 };
 
+std::vector<const Stop*> BuildFullRoute(const Bus& bus);
 }  // namespace transport

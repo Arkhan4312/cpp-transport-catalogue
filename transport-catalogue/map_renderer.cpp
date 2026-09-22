@@ -8,25 +8,6 @@ using namespace svg;
 
 namespace {
 
-std::vector<const Stop*> BuildFullRouteForRender(const Bus* bus) {
-    if (!bus || bus->stops.empty()) {
-        return {};
-    }
-    std::vector<const Stop*> route;
-    route.reserve(bus->is_ring ? bus->stops.size() + 1 : bus->stops.size() * 2 - 1);
-    route.insert(route.end(), bus->stops.begin(), bus->stops.end());
-    if (bus->is_ring) {
-        if (bus->stops.front() != bus->stops.back()) {
-            route.push_back(bus->stops.front());
-        }
-    } else {
-        for (auto it = bus->stops.rbegin() + 1; it != bus->stops.rend(); ++it) {
-            route.push_back(*it);
-        }
-    }
-    return route;
-}
-
 void AddLabelPair(svg::Document& doc, const Point& point, const std::string& text, int font_size, const Point& offset,
                   const Color& underlayer_color, double underlayer_width, const Color& text_color, bool bold = false) {
     Text underlayer;
@@ -152,7 +133,7 @@ void MapRenderer::RenderBusLines(svg::Document& doc, const std::vector<const Bus
         }
 
         const Color& color = palette[i % palette_size];
-        auto route = BuildFullRouteForRender(bus);
+        auto route = BuildFullRoute(*bus);
 
         if (route.empty()) {
             continue;
